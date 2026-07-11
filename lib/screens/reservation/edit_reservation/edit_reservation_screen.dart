@@ -96,7 +96,7 @@ class _EditReservationScreenState extends State<EditReservationScreen> {
             const SizedBox(height: 15),
 
             DropdownButtonFormField<String>(
-              value: selectedTime,
+                initialValue: selectedTime,
 
               decoration: const InputDecoration(
                 labelText: "Saat",

@@ -1,10 +1,28 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+
+import '../../providers/reservation_provider.dart';
+import '../../models/reservation_model.dart';
+import '../reservation/add_reservation/add_reservation_screen.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
 
+  String get formattedDate {
+    final now = DateTime.now();
+
+    return "${now.day.toString().padLeft(2, '0')}."
+        "${now.month.toString().padLeft(2, '0')}."
+        "${now.year}";
+  }
+
   @override
   Widget build(BuildContext context) {
+    final provider = Provider.of<ReservationProvider>(context);
+
+    final reservations =
+        provider.getReservationsByDate(formattedDate);
+
     return Scaffold(
       appBar: AppBar(
         title: const Text("Gebze Maxi Halısaha"),
@@ -13,111 +31,187 @@ class HomeScreen extends StatelessWidget {
         foregroundColor: Colors.white,
       ),
 
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(16),
+      body: Padding(
+        padding: const EdgeInsets.all(16),
 
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
 
-            children: [
+          children: [
 
-              const Text(
-                "11 Temmuz 2026",
-                style: TextStyle(
-                  fontSize: 22,
-                  fontWeight: FontWeight.bold,
-                ),
+            Text(
+              formattedDate,
+              style: const TextStyle(
+                fontSize: 22,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+
+
+            const SizedBox(height: 20),
+
+
+            Expanded(
+              child: ListView.builder(
+
+                itemCount: provider.workingHours.length,
+
+                itemBuilder: (context,index){
+
+                  final time =
+                      provider.workingHours[index];
+
+
+                  final reservation =
+                      provider.getReservationByTime(
+                        formattedDate,
+                        time,
+                      );
+
+
+                  return Card(
+
+                    child: ListTile(
+
+                      leading: Icon(
+                        Icons.sports_soccer,
+
+                        color: reservation == null
+                            ? Colors.green
+                            : Colors.red,
+                      ),
+
+
+                      title: Text(time),
+
+
+                      trailing: Text(
+
+                        reservation == null
+                            ? "Boş"
+                            : reservation.customerName,
+
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                        ),
+
+                      ),
+
+                    ),
+
+                  );
+
+                },
+
+              ),
+            ),
+
+
+
+            const Divider(),
+
+
+
+            const Text(
+              "Bugünkü Gelir",
+
+              style: TextStyle(
+                fontSize:20,
+                fontWeight: FontWeight.bold,
               ),
 
-
-              const SizedBox(height: 20),
-
-
-              _buildReservation("16:00", "Boş"),
-              _buildReservation("17:00", "Boş"),
-              _buildReservation("18:00", "Ahmet"),
-              _buildReservation("19:00", "Tayfunspor"),
-              _buildReservation("20:00", "Boş"),
+            ),
 
 
-              const SizedBox(height: 20),
 
+            Text(
 
-              const Divider(),
+              "${_calculateIncome(reservations)} TL",
 
-
-              const Text(
-                "Bugünkü Gelir",
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                ),
+              style: const TextStyle(
+                fontSize:30,
+                color:Colors.green,
+                fontWeight:FontWeight.bold,
               ),
 
+            ),
 
-              const SizedBox(height: 10),
 
 
-              const Text(
-                "0 TL",
-                style: TextStyle(
-                  fontSize: 30,
-                  color: Colors.green,
-                  fontWeight: FontWeight.bold,
+            const SizedBox(height:10),
+
+
+
+            SizedBox(
+
+              width:double.infinity,
+
+
+              child: ElevatedButton(
+
+                onPressed: (){
+
+
+                  Navigator.push(
+
+                    context,
+
+                    MaterialPageRoute(
+
+                      builder:(context)=>
+                          const AddReservationScreen(),
+
+                    ),
+
+                  );
+
+
+                },
+
+
+                child:
+                const Text(
+                  "➕ Yeni Rezervasyon",
                 ),
+
               ),
 
+            ),
 
-              const SizedBox(height: 20),
 
+          ],
 
-              SizedBox(
-                width: double.infinity,
-
-                child: ElevatedButton(
-
-                  onPressed: () {},
-
-                  child: const Text(
-                    "➕ Yeni Rezervasyon",
-                  ),
-
-                ),
-              ),
-
-            ],
-          ),
         ),
+
       ),
+
     );
+
   }
 
 
 
-  Widget _buildReservation(String saat, String isim) {
+  int _calculateIncome(
+      List<Reservation> reservations
+      ){
 
-    return Card(
+    int total = 0;
 
-      child: ListTile(
 
-        leading: const Icon(
-          Icons.sports_soccer,
-        ),
+    for(final reservation in reservations){
 
-        title: Text(saat),
+      if(reservation.isPaid){
 
-        trailing: Text(
-          isim,
+        total += reservation.price;
 
-          style: const TextStyle(
-            fontWeight: FontWeight.bold,
-          ),
-        ),
+      }
 
-      ),
+    }
 
-    );
+
+    return total;
 
   }
+
+
 }

@@ -87,7 +87,7 @@ class _AddReservationScreenState extends State<AddReservationScreen> {
             const SizedBox(height: 15),
 
             DropdownButtonFormField<String>(
-              value: selectedTime,
+              initialValue: selectedTime,
 
               decoration: const InputDecoration(
                 labelText: "Saat",

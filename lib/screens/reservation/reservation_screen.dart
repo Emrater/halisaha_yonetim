@@ -3,7 +3,6 @@ import 'package:provider/provider.dart';
 
 import '../../providers/reservation_provider.dart';
 import '../../models/reservation_model.dart';
-import 'add_reservation/add_reservation_screen.dart';
 import 'edit_reservation/edit_reservation_screen.dart';
 
 class ReservationScreen extends StatefulWidget {
@@ -91,6 +90,7 @@ class _ReservationScreenState extends State<ReservationScreen> {
                       if (reservation != null) {
                         showDialog(
                           context: context,
+
                           builder: (context) {
                             return AlertDialog(
                               title: const Text("Rezervasyon Detayı"),
@@ -103,28 +103,20 @@ class _ReservationScreenState extends State<ReservationScreen> {
 
                                   Text("Telefon: ${reservation.phone}"),
 
+                                  Text("Saat: ${reservation.time}"),
+
                                   Text("Ücret: ${reservation.price} TL"),
 
                                   Text(
                                     reservation.isPaid
-                                        ? "Ödeme: Alındı"
-                                        : "Ödeme: Bekliyor",
+                                        ? "Ödeme Alındı"
+                                        : "Ödeme Bekliyor",
                                   ),
                                 ],
                               ),
 
                               actions: [
                                 TextButton(
-                                  onPressed: () {
-                                    Navigator.pop(context);
-                                  },
-
-                                  child: const Text("Kapat"),
-                                ),
-
-                                TextButton(
-                                  child: const Text("Düzenle"),
-
                                   onPressed: () {
                                     Navigator.pop(context);
 
@@ -142,30 +134,62 @@ class _ReservationScreenState extends State<ReservationScreen> {
                                       ),
                                     );
                                   },
+
+                                  child: const Text("Düzenle"),
                                 ),
 
                                 TextButton(
-                                  child: const Text(
-                                    "Sil",
-
-                                    style: TextStyle(color: Colors.red),
-                                  ),
-
                                   onPressed: () {
                                     Navigator.pop(context);
 
-                                    provider.deleteReservation(
-                                      provider.reservations.indexOf(
-                                        reservation,
-                                      ),
-                                    );
+                                    showDialog(
+                                      context: context,
 
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      const SnackBar(
-                                        content: Text("Rezervasyon silindi"),
-                                      ),
+                                      builder: (context) {
+                                        return AlertDialog(
+                                          title: const Text("Rezervasyon Sil"),
+
+                                          content: const Text(
+                                            "Bu rezervasyonu silmek istediğine emin misin?",
+                                          ),
+
+                                          actions: [
+                                            TextButton(
+                                              onPressed: () {
+                                                Navigator.pop(context);
+                                              },
+
+                                              child: const Text("Vazgeç"),
+                                            ),
+
+                                            TextButton(
+                                              onPressed: () {
+                                                provider.deleteReservation(
+                                                  provider.reservations.indexOf(
+                                                    reservation,
+                                                  ),
+                                                );
+
+                                                Navigator.pop(context);
+                                              },
+
+                                              child: const Text("Sil"),
+                                            ),
+                                          ],
+                                        );
+                                      },
                                     );
                                   },
+
+                                  child: const Text("Sil"),
+                                ),
+
+                                TextButton(
+                                  onPressed: () {
+                                    Navigator.pop(context);
+                                  },
+
+                                  child: const Text("Kapat"),
                                 ),
                               ],
                             );
@@ -203,20 +227,6 @@ class _ReservationScreenState extends State<ReservationScreen> {
             ),
           ),
         ],
-      ),
-
-      floatingActionButton: FloatingActionButton(
-        child: const Icon(Icons.add),
-
-        onPressed: () {
-          Navigator.push(
-            context,
-
-            MaterialPageRoute(
-              builder: (context) => const AddReservationScreen(),
-            ),
-          );
-        },
       ),
     );
   }
