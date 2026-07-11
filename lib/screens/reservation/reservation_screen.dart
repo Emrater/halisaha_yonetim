@@ -4,366 +4,220 @@ import 'package:provider/provider.dart';
 import '../../providers/reservation_provider.dart';
 import '../../models/reservation_model.dart';
 import 'add_reservation/add_reservation_screen.dart';
-
-
+import 'edit_reservation/edit_reservation_screen.dart';
 
 class ReservationScreen extends StatefulWidget {
-
   const ReservationScreen({super.key});
 
-
   @override
-  State<ReservationScreen> createState() =>
-      _ReservationScreenState();
-
+  State<ReservationScreen> createState() => _ReservationScreenState();
 }
 
-
-
 class _ReservationScreenState extends State<ReservationScreen> {
-
-
   DateTime selectedDate = DateTime.now();
 
-
-
   String get formattedDate {
-
-    return
-        "${selectedDate.day.toString().padLeft(2,'0')}."
-        "${selectedDate.month.toString().padLeft(2,'0')}."
+    return "${selectedDate.day.toString().padLeft(2, '0')}."
+        "${selectedDate.month.toString().padLeft(2, '0')}."
         "${selectedDate.year}";
-
   }
-
-
-
-
 
   @override
   Widget build(BuildContext context) {
-
-
-    final provider =
-    Provider.of<ReservationProvider>(context);
-
-
+    final provider = Provider.of<ReservationProvider>(context);
 
     return Scaffold(
-
-
-      appBar: AppBar(
-
-        title: const Text(
-          "Rezervasyonlar",
-        ),
-
-        centerTitle: true,
-
-      ),
-
-
-
+      appBar: AppBar(title: const Text("Rezervasyonlar"), centerTitle: true),
 
       body: Column(
-
-
         children: [
-
-
-
           Row(
-
-            mainAxisAlignment:
-            MainAxisAlignment.center,
-
+            mainAxisAlignment: MainAxisAlignment.center,
 
             children: [
-
-
-
               IconButton(
+                icon: const Icon(Icons.arrow_back),
 
-                icon:
-                const Icon(
-                  Icons.arrow_back,
-                ),
-
-
-                onPressed: (){
-
-
+                onPressed: () {
                   setState(() {
-
-
-                    selectedDate =
-                        selectedDate.subtract(
-                          const Duration(days:1),
-                        );
-
-
+                    selectedDate = selectedDate.subtract(
+                      const Duration(days: 1),
+                    );
                   });
-
-
                 },
-
-
               ),
-
-
-
-
 
               Text(
-
                 formattedDate,
 
-                style:
-                const TextStyle(
+                style: const TextStyle(
+                  fontSize: 20,
 
-                  fontSize:20,
-
-                  fontWeight:
-                  FontWeight.bold,
-
+                  fontWeight: FontWeight.bold,
                 ),
-
               ),
-
-
-
-
 
               IconButton(
+                icon: const Icon(Icons.arrow_forward),
 
-                icon:
-                const Icon(
-                  Icons.arrow_forward,
-                ),
-
-
-                onPressed: (){
-
-
+                onPressed: () {
                   setState(() {
-
-
-                    selectedDate =
-                        selectedDate.add(
-                          const Duration(days:1),
-                        );
-
-
+                    selectedDate = selectedDate.add(const Duration(days: 1));
                   });
-
-
                 },
-
-
               ),
-
-
-
             ],
-
           ),
 
-
-
-
-
           Expanded(
+            child: ListView.builder(
+              itemCount: provider.workingHours.length,
 
+              itemBuilder: (context, index) {
+                final time = provider.workingHours[index];
 
-            child:
-
-            ListView.builder(
-
-
-              itemCount:
-              provider.workingHours.length,
-
-
-
-              itemBuilder:
-                  (context,index){
-
-
-
-                final time =
-                provider.workingHours[index];
-
-
-
-                Reservation? reservation =
-                provider.getReservationByTime(
+                Reservation? reservation = provider.getReservationByTime(
                   formattedDate,
                   time,
                 );
 
-
-
-
-                bool isEmpty =
-                    reservation == null;
-
-
-
+                bool isEmpty = reservation == null;
 
                 return Card(
+                  margin: const EdgeInsets.all(8),
 
+                  child: ListTile(
+                    onTap: () {
+                      if (reservation != null) {
+                        showDialog(
+                          context: context,
+                          builder: (context) {
+                            return AlertDialog(
+                              title: const Text("Rezervasyon Detayı"),
 
-                  margin:
-                  const EdgeInsets.all(8),
+                              content: Column(
+                                mainAxisSize: MainAxisSize.min,
 
+                                children: [
+                                  Text("Müşteri: ${reservation.customerName}"),
 
+                                  Text("Telefon: ${reservation.phone}"),
 
-                  child:
+                                  Text("Ücret: ${reservation.price} TL"),
 
-                  ListTile(
+                                  Text(
+                                    reservation.isPaid
+                                        ? "Ödeme: Alındı"
+                                        : "Ödeme: Bekliyor",
+                                  ),
+                                ],
+                              ),
 
+                              actions: [
+                                TextButton(
+                                  onPressed: () {
+                                    Navigator.pop(context);
+                                  },
 
+                                  child: const Text("Kapat"),
+                                ),
 
-                    leading:
+                                TextButton(
+                                  child: const Text("Düzenle"),
 
-                    Icon(
+                                  onPressed: () {
+                                    Navigator.pop(context);
 
+                                    Navigator.push(
+                                      context,
+
+                                      MaterialPageRoute(
+                                        builder: (context) =>
+                                            EditReservationScreen(
+                                              reservation: reservation,
+
+                                              index: provider.reservations
+                                                  .indexOf(reservation),
+                                            ),
+                                      ),
+                                    );
+                                  },
+                                ),
+
+                                TextButton(
+                                  child: const Text(
+                                    "Sil",
+
+                                    style: TextStyle(color: Colors.red),
+                                  ),
+
+                                  onPressed: () {
+                                    Navigator.pop(context);
+
+                                    provider.deleteReservation(
+                                      provider.reservations.indexOf(
+                                        reservation,
+                                      ),
+                                    );
+
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(
+                                        content: Text("Rezervasyon silindi"),
+                                      ),
+                                    );
+                                  },
+                                ),
+                              ],
+                            );
+                          },
+                        );
+                      }
+                    },
+
+                    leading: Icon(
                       Icons.sports_soccer,
 
-                      color:
-
-                      isEmpty
-                          ? Colors.green
-                          : Colors.red,
-
+                      color: isEmpty ? Colors.green : Colors.red,
                     ),
 
-
-
-
-                    title:
-
-                    Text(
-
+                    title: Text(
                       time,
 
-                      style:
-                      const TextStyle(
-
-                        fontWeight:
-                        FontWeight.bold,
-
-                      ),
-
+                      style: const TextStyle(fontWeight: FontWeight.bold),
                     ),
 
-
-
-
-                    subtitle:
-
-                    Text(
-
+                    subtitle: Text(
                       isEmpty
-
                           ? "Müsait"
-
-                          :
-
-                      "${reservation.customerName} - ${reservation.phone}",
-
+                          : "${reservation.customerName} - ${reservation.phone}",
                     ),
 
+                    trailing: Text(
+                      isEmpty ? "" : "${reservation.price} TL",
 
-
-
-                    trailing:
-
-                    Text(
-
-                      isEmpty
-
-                          ? ""
-
-                          :
-
-                      "${reservation.price} TL",
-
-                      style:
-                      const TextStyle(
-
-                        fontWeight:
-                        FontWeight.bold,
-
-                      ),
-
+                      style: const TextStyle(fontWeight: FontWeight.bold),
                     ),
-
-
-
                   ),
-
-
-
                 );
-
-
               },
-
-
             ),
-
-
           ),
-
-
-
         ],
-
-
       ),
 
+      floatingActionButton: FloatingActionButton(
+        child: const Icon(Icons.add),
 
-
-
-      floatingActionButton:
-
-      FloatingActionButton(
-
-        child:
-        const Icon(
-          Icons.add,
-        ),
-
-
-        onPressed: (){
-
-
+        onPressed: () {
           Navigator.push(
-
             context,
 
             MaterialPageRoute(
-
-              builder:(context)=>
-
-              const AddReservationScreen(),
-
+              builder: (context) => const AddReservationScreen(),
             ),
-
           );
-
-
         },
-
       ),
-
-
-
     );
-
-
   }
-
-
 }

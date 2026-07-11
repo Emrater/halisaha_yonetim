@@ -4,39 +4,23 @@ import 'package:provider/provider.dart';
 import '../../../models/reservation_model.dart';
 import '../../../providers/reservation_provider.dart';
 
-
 class EditReservationScreen extends StatefulWidget {
-
   final Reservation reservation;
   final int index;
 
-
   const EditReservationScreen({
-
     super.key,
 
     required this.reservation,
 
     required this.index,
-
   });
 
-
-
   @override
-  State<EditReservationScreen> createState() =>
-      _EditReservationScreenState();
-
+  State<EditReservationScreen> createState() => _EditReservationScreenState();
 }
 
-
-
-
-class _EditReservationScreenState
-    extends State<EditReservationScreen> {
-
-
-
+class _EditReservationScreenState extends State<EditReservationScreen> {
   late TextEditingController dateController;
 
   late TextEditingController nameController;
@@ -45,415 +29,205 @@ class _EditReservationScreenState
 
   late TextEditingController priceController;
 
-
-
   late String selectedTime;
-
 
   late bool isPaid;
 
-
-
   final List<String> times = [
-
     "16:00",
     "17:00",
     "18:00",
     "19:00",
     "20:00",
     "21:00",
-
   ];
-
-
-
 
   @override
   void initState() {
-
     super.initState();
 
+    dateController = TextEditingController(text: widget.reservation.date);
 
-    dateController =
-        TextEditingController(
-          text: widget.reservation.date,
-        );
+    nameController = TextEditingController(
+      text: widget.reservation.customerName,
+    );
 
+    phoneController = TextEditingController(text: widget.reservation.phone);
 
-    nameController =
-        TextEditingController(
-          text: widget.reservation.customerName,
-        );
+    priceController = TextEditingController(
+      text: widget.reservation.price.toString(),
+    );
 
+    selectedTime = widget.reservation.time;
 
-    phoneController =
-        TextEditingController(
-          text: widget.reservation.phone,
-        );
-
-
-    priceController =
-        TextEditingController(
-          text: widget.reservation.price.toString(),
-        );
-
-
-    selectedTime =
-        widget.reservation.time;
-
-
-    isPaid =
-        widget.reservation.isPaid;
-
-
+    isPaid = widget.reservation.isPaid;
   }
 
+  @override
+  void dispose() {
+    dateController.dispose();
+    nameController.dispose();
+    phoneController.dispose();
+    priceController.dispose();
 
-
-
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
-
-
     return Scaffold(
-
-
-      appBar: AppBar(
-
-        title:
-            const Text("Rezervasyon Düzenle"),
-
-      ),
-
-
+      appBar: AppBar(title: const Text("Rezervasyon Düzenle")),
 
       body: Padding(
-
-        padding:
-            const EdgeInsets.all(16),
-
+        padding: const EdgeInsets.all(16),
 
         child: Column(
-
-
           children: [
-
-
-
             TextField(
+              controller: dateController,
 
-              controller:
-                  dateController,
-
-
-              decoration:
-                  const InputDecoration(
-
+              decoration: const InputDecoration(
                 labelText: "Tarih",
 
-                border:
-                    OutlineInputBorder(),
-
+                border: OutlineInputBorder(),
               ),
-
             ),
 
-
-
-
             const SizedBox(height: 15),
-
-
-
 
             DropdownButtonFormField<String>(
+              value: selectedTime,
 
-
-              value:
-                  selectedTime,
-
-
-              decoration:
-                  const InputDecoration(
-
+              decoration: const InputDecoration(
                 labelText: "Saat",
 
-                border:
-                    OutlineInputBorder(),
-
+                border: OutlineInputBorder(),
               ),
 
-
-
-              items:
-                  times.map((time){
-
-
-                return DropdownMenuItem(
-
-                  value:
-                      time,
-
-
-                  child:
-                      Text(time),
-
-                );
-
-
+              items: times.map((time) {
+                return DropdownMenuItem(value: time, child: Text(time));
               }).toList(),
 
-
-
-              onChanged: (value){
-
-
+              onChanged: (value) {
                 setState(() {
-
-
-                  selectedTime =
-                      value!;
-
-
+                  selectedTime = value!;
                 });
-
-
               },
-
-
             ),
-
-
-
 
             const SizedBox(height: 15),
 
-
-
-
             TextField(
+              controller: nameController,
 
-              controller:
-                  nameController,
+              decoration: const InputDecoration(
+                labelText: "Müşteri Adı",
 
-
-              decoration:
-                  const InputDecoration(
-
-                labelText:
-                    "Müşteri Adı",
-
-                border:
-                    OutlineInputBorder(),
-
+                border: OutlineInputBorder(),
               ),
-
             ),
-
-
-
 
             const SizedBox(height: 15),
 
-
-
-
             TextField(
+              controller: phoneController,
 
-              controller:
-                  phoneController,
+              decoration: const InputDecoration(
+                labelText: "Telefon",
 
-
-              decoration:
-                  const InputDecoration(
-
-                labelText:
-                    "Telefon",
-
-                border:
-                    OutlineInputBorder(),
-
+                border: OutlineInputBorder(),
               ),
-
             ),
-
-
-
 
             const SizedBox(height: 15),
 
-
-
-
             TextField(
+              controller: priceController,
 
-              controller:
-                  priceController,
+              keyboardType: TextInputType.number,
 
+              decoration: const InputDecoration(
+                labelText: "Ücret",
 
-              keyboardType:
-                  TextInputType.number,
-
-
-              decoration:
-                  const InputDecoration(
-
-                labelText:
-                    "Ücret",
-
-                border:
-                    OutlineInputBorder(),
-
+                border: OutlineInputBorder(),
               ),
-
             ),
-
-
-
-
 
             CheckboxListTile(
+              title: const Text("Ödeme Alındı"),
 
-              title:
-                  const Text(
-                    "Ödeme Alındı",
-                  ),
+              value: isPaid,
 
-
-              value:
-                  isPaid,
-
-
-              onChanged: (value){
-
-
+              onChanged: (value) {
                 setState(() {
-
-
-                  isPaid =
-                      value!;
-
-
+                  isPaid = value!;
                 });
-
-
               },
-
-
             ),
-
-
-
 
             const Spacer(),
 
-
-
-
             SizedBox(
+              width: double.infinity,
 
-              width:
-                  double.infinity,
+              height: 50,
 
+              child: ElevatedButton(
+                onPressed: () {
+                  if (nameController.text.isEmpty ||
+                      phoneController.text.isEmpty) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text("Müşteri adı ve telefon giriniz"),
+                      ),
+                    );
 
-              height:
-                  50,
+                    return;
+                  }
 
-
-
-              child:
-                  ElevatedButton(
-
-
-
-                onPressed: (){
-
-
-
-                  final updated =
-                      Reservation(
-
-
-                    date:
-                        dateController.text,
-
-
-                    time:
-                        selectedTime,
-
-
-                    customerName:
-                        nameController.text,
-
-
-                    phone:
-                        phoneController.text,
-
-
-                    price:
-                        int.tryParse(
-                          priceController.text,
-                        ) ?? 0,
-
-
-                    isPaid:
-                        isPaid,
-
-
-
-                  );
-
-
-
-                  Provider.of<ReservationProvider>(
-
+                  final provider = Provider.of<ReservationProvider>(
                     context,
-
-                    listen:false,
-
-
-                  ).updateReservation(
-
-                    widget.index,
-
-                    updated,
-
+                    listen: false,
                   );
 
+                  final existing = provider.getReservationByTime(
+                    dateController.text,
+                    selectedTime,
+                  );
 
+                  if (existing != null && existing != widget.reservation) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text("Bu saat dolu!")),
+                    );
+
+                    return;
+                  }
+
+                  final updated = Reservation(
+                    date: dateController.text,
+
+                    time: selectedTime,
+
+                    customerName: nameController.text,
+
+                    phone: phoneController.text,
+
+                    price: int.tryParse(priceController.text) ?? 0,
+
+                    isPaid: isPaid,
+                  );
+
+                  provider.updateReservation(widget.index, updated);
 
                   Navigator.pop(context);
-
-
-
                 },
 
-
-
-                child:
-                    const Text(
-                      "Kaydet",
-                    ),
-
-
+                child: const Text("Kaydet"),
               ),
-
             ),
-
-
-
           ],
-
         ),
-
       ),
-
     );
-
-
   }
-
-
-
 }

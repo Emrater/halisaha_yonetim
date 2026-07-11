@@ -39,6 +39,15 @@ class _AddReservationScreenState extends State<AddReservationScreen> {
   }
 
   @override
+  void dispose() {
+    nameController.dispose();
+    phoneController.dispose();
+    priceController.dispose();
+
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text("Yeni Rezervasyon")),
@@ -62,9 +71,8 @@ class _AddReservationScreenState extends State<AddReservationScreen> {
 
                     initialDate: selectedDate,
 
-                    firstDate: DateTime(2026),
-
-                    lastDate: DateTime(2030),
+                    firstDate: DateTime.now(),
+                    lastDate: DateTime.now().add(const Duration(days: 365)),
                   );
 
                   if (picked != null) {
@@ -159,9 +167,12 @@ class _AddReservationScreenState extends State<AddReservationScreen> {
 
               child: ElevatedButton(
                 onPressed: () {
-                  if (nameController.text.isEmpty) {
+                  if (nameController.text.isEmpty ||
+                      phoneController.text.isEmpty) {
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text("Müşteri adı giriniz")),
+                      const SnackBar(
+                        content: Text("Müşteri adi ve telefon giriniz"),
+                      ),
                     );
 
                     return;
