@@ -1,31 +1,58 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:intl/date_symbol_data_local.dart';
 
 import 'providers/reservation_provider.dart';
+import 'providers/cash_provider.dart';
+
 import 'screens/main_navigation/main_navigation_screen.dart';
 
 
-void main() {
-  runApp(const HalisahaApp());
+void main() async {
+
+  WidgetsFlutterBinding.ensureInitialized();
+
+  await initializeDateFormatting('tr_TR', null);
+
+  runApp(
+    const HalisahaApp(),
+  );
+
 }
 
 
+
 class HalisahaApp extends StatelessWidget {
+
   const HalisahaApp({super.key});
 
 
   @override
   Widget build(BuildContext context) {
 
-    return ChangeNotifierProvider(
+    return MultiProvider(
 
-      create: (_) => ReservationProvider(),
+      providers: [
+
+        ChangeNotifierProvider(
+          create: (_) => ReservationProvider(),
+        ),
+
+
+        ChangeNotifierProvider(
+          create: (_) => CashProvider(),
+        ),
+
+      ],
+
 
       child: MaterialApp(
 
         debugShowCheckedModeBanner: false,
 
-        title: 'Halısaha Yönetim',
+
+        title: "Halısaha Yönetim",
+
 
         theme: ThemeData(
 
@@ -33,9 +60,11 @@ class HalisahaApp extends StatelessWidget {
             seedColor: Colors.green,
           ),
 
+
           useMaterial3: true,
 
         ),
+
 
         home: const MainNavigationScreen(),
 
@@ -44,4 +73,5 @@ class HalisahaApp extends StatelessWidget {
     );
 
   }
+
 }

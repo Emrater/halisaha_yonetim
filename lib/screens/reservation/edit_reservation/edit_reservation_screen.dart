@@ -33,15 +33,6 @@ class _EditReservationScreenState extends State<EditReservationScreen> {
 
   late bool isPaid;
 
-  final List<String> times = [
-    "16:00",
-    "17:00",
-    "18:00",
-    "19:00",
-    "20:00",
-    "21:00",
-  ];
-
   @override
   void initState() {
     super.initState();
@@ -96,7 +87,12 @@ class _EditReservationScreenState extends State<EditReservationScreen> {
             const SizedBox(height: 15),
 
             DropdownButtonFormField<String>(
-                initialValue: selectedTime,
+              initialValue:
+                  Provider.of<ReservationProvider>(
+                    context,
+                  ).workingHours.contains(selectedTime)
+                  ? selectedTime
+                  : null,
 
               decoration: const InputDecoration(
                 labelText: "Saat",
@@ -104,9 +100,14 @@ class _EditReservationScreenState extends State<EditReservationScreen> {
                 border: OutlineInputBorder(),
               ),
 
-              items: times.map((time) {
-                return DropdownMenuItem(value: time, child: Text(time));
-              }).toList(),
+              items: Provider.of<ReservationProvider>(context).workingHours.map(
+                (time) {
+                  return DropdownMenuItem<String>(
+                    value: time,
+                    child: Text(time),
+                  );
+                },
+              ).toList(),
 
               onChanged: (value) {
                 setState(() {
